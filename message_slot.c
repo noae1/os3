@@ -24,7 +24,7 @@ static struct chardev_info device_info;
 
 
 static channel_node* find_channel(message_slot_file *slot_file, int channel_id) {
-    struct channel_node *curr;
+    channel_node *curr;
 
     curr = slot_file->head;
     while (curr) {
@@ -66,7 +66,7 @@ static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_par
     return 0; // success
 }
 
-void free_channels(struct channel_node *head) {
+void free_channels(channel_node *head) {
     channel_node *current = head;
     channel_node *tmp;
 
@@ -98,7 +98,7 @@ static int device_release( struct inode* inode,
                            struct file*  file)
 {
   // Free memory or perform cleanup if needed
-  int minor_number = iminor(inode);
+  //int minor_number = iminor(inode);
   //message_slot_file *slot = &device_info.slots[minor_number];
 
   printk("Invoking device_release(%p,%p)\n", inode, file);
@@ -118,7 +118,7 @@ static ssize_t device_read( struct file* file,
                             loff_t*      offset )
 {
   int i = 0;
-  int minor_number = iminor(file->f_inode);
+  //int minor_number = iminor(file->f_inode);
   //message_slot_file *slot = &device_info.slots[minor_number];
   ssize_t bytes_read = -1;
   channel_node* cur_channel;
@@ -175,7 +175,7 @@ static ssize_t device_write( struct file*       file,
                              loff_t*            offset)
 {
   int i = 0;
-  int minor_number = iminor(file->f_inode);
+  //int minor_number = iminor(file->f_inode);
   //message_slot_file *slot = &device_info.slots[minor_number];
   ssize_t bytes_written = -1;
   channel_node* cur_channel;
@@ -316,7 +316,7 @@ static int __init simple_init(void)
   printk( "Registeration is successful. ");
   printk( "If you want to talk to the device driver,\n" );
   printk( "you have to create a device file:\n" );
-  printk( "mknod /dev/%s c %d 0\n", DEVICE_FILE_NAME, MAJOR_NUM );
+  printk( "mknod /dev/%s c %d 0\n", DEVICE_FILE_NAME, MAJOR_NUMBER );
   printk( "You can echo/cat to/from the device file.\n" );
   printk( "Dont forget to rm the device file and "
           "rmmod when you're done\n" );

@@ -14,7 +14,7 @@
 #define DEVICE_FILE_NAME "simple_char_dev"
 
 
-typedef struct channel_node {
+typedef struct one_channel {
     int channel_id;  //long
     char message[MAX_MESSAGE_SIZE]; // 128
     int message_length;
@@ -22,16 +22,14 @@ typedef struct channel_node {
 }channel_node;
 
 // Data structure to store message slots
-typedef struct message_slot_file {
-    struct channel_node *head;
+typedef struct message_slot {
+    channel_node *head;
     int number_channels;
-    struct channel_node *tail;
-
-    
+    channel_node *tail;
 }message_slot_file;
 
 struct chardev_info {
-    struct message_slot_file slots[MAX_SLOTS_DEV_FILES];  // 256 or 257?
+    message_slot_file slots[MAX_SLOTS_DEV_FILES];  // 256 or 257?
 };
 
 #endif
