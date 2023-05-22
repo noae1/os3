@@ -23,8 +23,8 @@ MODULE_LICENSE("GPL");
 static struct chardev_info device_info;
 
 
-static channel_node* find_channel(message_slot_file *slot_file, int channel_id) {
-    channel_node *curr;
+static struct channel_node* find_channel(message_slot_file *slot_file, int channel_id) {
+    struct channel_node *curr;
 
     curr = slot_file->head;
     while (curr) {
@@ -40,7 +40,7 @@ static channel_node* find_channel(message_slot_file *slot_file, int channel_id) 
 
 static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_param) {
     
-    channel_node *new_channel;
+    struct channel_node *new_channel;
 
     new_channel = kmalloc(sizeof(channel_node), GFP_KERNEL);
     if (new_channel == NULL){
@@ -67,12 +67,12 @@ static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_par
 }
 
 static void free_channels(channel_node *head) {
-    channel_node *current = head;
-    channel_node *tmp;
+    struct channel_node *curr = head;
+    struct channel_node *tmp;
 
-    while (current != NULL) {
-        tmp = current;
-        current = current->next;
+    while (curr != NULL) {
+        tmp = curr;
+        curr = current->next;
         kfree(tmp);
     }
 }
@@ -121,11 +121,11 @@ static ssize_t device_read( struct file* file,
   //int minor_number = iminor(file->f_inode);
   //message_slot_file *slot = &device_info.slots[minor_number];
   ssize_t bytes_read = -1;
-  channel_node* cur_channel;
+  struct channel_node* cur_channel;
 
    printk( "Invocing device_read(%p,%ld) - ",file, length);
 
-  cur_channel = (channel_node*)file->private_data;
+  cur_channel = (struct channel_node*)file->private_data;
   // No channel has been set on the file descriptor
   if (cur_channel == NULL || buffer == NULL){
       return -EINVAL;
@@ -178,10 +178,10 @@ static ssize_t device_write( struct file*       file,
   //int minor_number = iminor(file->f_inode);
   //message_slot_file *slot = &device_info.slots[minor_number];
   ssize_t bytes_written = -1;
-  channel_node* cur_channel;
+  struct channel_node* cur_channel;
   char cur_message[MAX_MESSAGE_SIZE];
 
-  cur_channel = (channel_node*)file->private_data;
+  cur_channel = (struct channel_node*)file->private_data;
 
   // No channel has been set on the file descriptor
   if (cur_channel == NULL || buffer == NULL){
@@ -240,7 +240,7 @@ static long device_ioctl( struct   file* file,
 {
   int minor_number;
   message_slot_file* slot;
-  channel_node* cur_channel;
+  struct channel_node* cur_channel;
 
   if (ioctl_param == 0 || MSG_SLOT_CHANNEL != ioctl_command_id){
       printk("Channel id must be nonZero and command should be MSG_SLOT_CHANNEL");
@@ -330,7 +330,7 @@ static void __exit simple_cleanup(void)
   // Unregister the device
   // The module should free all memory that it allocated
   int i = 0;
-  channel_node* messageSlot_head = NULL;
+  struct channel_node* messageSlot_head = NULL;
 
   for (i = 0; i < MAX_SLOTS_DEV_FILES ; i++){
     messageSlot_head = device_info.slots[i].head;
