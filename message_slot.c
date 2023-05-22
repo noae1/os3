@@ -66,7 +66,7 @@ static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_par
     return 0; // success
 }
 
-void free_channels(channel_node *head) {
+static void free_channels(channel_node *head) {
     channel_node *current = head;
     channel_node *tmp;
 
@@ -305,7 +305,7 @@ static int __init simple_init(void)
   // Negative values signify an error
   if( rc < 0 ) {
     printk( KERN_ERR "%s registraion failed for  %d\n",
-                       DEVICE_FILE_NAME, MAJOR_NUM );
+                       DEVICE_FILE_NAME, MAJOR_NUMBER );
     return rc;
   }
 

@@ -18,7 +18,7 @@ typedef struct one_channel {
     int channel_id;  //long
     char message[MAX_MESSAGE_SIZE]; // 128
     int message_length;
-    struct channel_node *next;
+    channel_node *next;
 }channel_node;
 
 // Data structure to store message slots
