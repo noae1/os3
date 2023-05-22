@@ -34,11 +34,4 @@ struct chardev_info {
     struct message_slot_file slots[MAX_SLOTS_DEV_FILES];  // 256 or 257?
 };
 
-
-int device_open(struct inode *inode, struct file *file);
-int device_release(struct inode *inode, struct file *file);
-ssize_t device_read(struct file *file, char __user *buffer, size_t length, loff_t *offset);
-ssize_t device_write(struct file *file, const char __user *buffer, size_t length, loff_t *offset);
-long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param);
-
 #endif

@@ -13,6 +13,7 @@
 #include <linux/fs.h>       /* for register_chrdev */
 #include <linux/uaccess.h>  /* for get_user and put_user */
 #include <linux/string.h>   /* for memset. NOTE - not string.h!*/
+#include <linux/slab.h>
 
 MODULE_LICENSE("GPL");
 
@@ -47,7 +48,7 @@ static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_par
     }
 
     new_channel->channel_id = channel_id_param;
-    new_channel->message = NULL;
+    //new_channel->message = NULL;
     new_channel->message_length = 0;   
     new_channel->next = NULL;
 
@@ -66,27 +67,26 @@ static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_par
 }
 
 void free_channels(struct channel_node *head) {
-    struct channel_node *current = head;
-    struct channel_node *next;
+    channel_node *current = head;
+    channel_node *tmp;
 
     while (current != NULL) {
-        next = current->next;
-        kfree(current);
-        current = next;
+        tmp = current;
+        current = current->next;
+        kfree(tmp);
     }
 }
 
 
 
 //================== DEVICE FUNCTIONS ===========================
-static int device_open( struct inode* inode,
-                        struct file*  file )
+static int device_open( struct inode* inode, struct file*  file )
 {
   int minor_number = iminor(inode);
 
   printk("Invoking device_open(%p)\n", file);
   
-  if (minor >= MAX_SLOTS_DEV_FILES){
+  if (minor_number >= MAX_SLOTS_DEV_FILES){
       return -ENODEV;
   }
 
@@ -99,7 +99,7 @@ static int device_release( struct inode* inode,
 {
   // Free memory or perform cleanup if needed
   int minor_number = iminor(inode);
-  message_slot_file *slot = &device_info.slots[minor_number];
+  //message_slot_file *slot = &device_info.slots[minor_number];
 
   printk("Invoking device_release(%p,%p)\n", inode, file);
 
@@ -117,9 +117,9 @@ static ssize_t device_read( struct file* file,
                             size_t       length,
                             loff_t*      offset )
 {
-  
+  int i = 0;
   int minor_number = iminor(file->f_inode);
-  message_slot_file *slot = &device_info.slots[minor_number];
+  //message_slot_file *slot = &device_info.slots[minor_number];
   ssize_t bytes_read = -1;
   channel_node* cur_channel;
 
@@ -176,7 +176,7 @@ static ssize_t device_write( struct file*       file,
 {
   int i = 0;
   int minor_number = iminor(file->f_inode);
-  message_slot_file *slot = &device_info.slots[minor_number];
+  //message_slot_file *slot = &device_info.slots[minor_number];
   ssize_t bytes_written = -1;
   channel_node* cur_channel;
   char cur_message[MAX_MESSAGE_SIZE];
@@ -189,7 +189,7 @@ static ssize_t device_write( struct file*       file,
   }
 
   // If the passed message length is 0 or more than 128
-  if (length == 0 || length > MAX_MESSAGE_LENGTH){
+  if (length == 0 || length > MAX_MESSAGE_SIZE){
       printk("The passed message length is 0 or more than 128");
       return -EMSGSIZE;
   }
@@ -254,7 +254,7 @@ static long device_ioctl( struct   file* file,
   
   minor_number = iminor(file->f_inode);
   printk( "Invoking ioctl: setting file descriptor's channel id "
-          "channel id : %ld of minor : %d\n", ioctl_param,  minor_num);
+          "channel id : %ld of minor : %d\n", ioctl_param,  minor_number);
   
   slot = &device_info.slots[minor_number];
 
@@ -300,7 +300,7 @@ static int __init simple_init(void)
   memset( &device_info, 0, sizeof(struct chardev_info) );
 
   // Register driver capabilities. Obtain major num
-  rc = register_chrdev( MAJOR_NUM, DEVICE_RANGE_NAME, &Fops );
+  rc = register_chrdev( MAJOR_NUMBER, DEVICE_RANGE_NAME, &Fops );
 
   // Negative values signify an error
   if( rc < 0 ) {
@@ -330,7 +330,7 @@ static void __exit simple_cleanup(void)
   // Unregister the device
   // The module should free all memory that it allocated
   int i = 0;
-  char* messageSlot_head = NULL;
+  channel_node* messageSlot_head = NULL;
 
   for (i = 0; i < MAX_SLOTS_DEV_FILES ; i++){
     messageSlot_head = device_info.slots[i].head;
@@ -339,7 +339,7 @@ static void __exit simple_cleanup(void)
     }
   }
 
-  unregister_chrdev(MAJOR_NUM, DEVICE_RANGE_NAME);
+  unregister_chrdev(MAJOR_NUMBER, DEVICE_RANGE_NAME);
 }
 
 //---------------------------------------------------------------
