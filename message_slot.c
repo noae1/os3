@@ -42,7 +42,7 @@ static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_par
     
     struct channel_node *new_channel;
 
-    new_channel = kmalloc(sizeof(channel_node), GFP_KERNEL);
+    new_channel = kmalloc(sizeof(struct channel_node), GFP_KERNEL);
     if (new_channel == NULL){
         return -ENOMEM;
     }
@@ -66,7 +66,7 @@ static int add_channel_to_slot (message_slot_file *slot_file, int channel_id_par
     return 0; // success
 }
 
-static void free_channels(channel_node *head) {
+static void free_channels(struct channel_node *head) {
     struct channel_node *curr = head;
     struct channel_node *tmp;
 
@@ -212,7 +212,7 @@ static ssize_t device_write( struct file*       file,
   */
 
   
-  // safely copy data from user space to kernel space:
+  // safely copy data from user space to kernel space using cur_message buffer:
   for (i = 0; i < length ; i++){
     if (get_user(cur_message[i], &buffer[i]) != 0){
       printk("Failed to copy data from user space");
