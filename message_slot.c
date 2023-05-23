@@ -72,7 +72,7 @@ static void free_channels(struct channel_node *head) {
 
     while (curr != NULL) {
         tmp = curr;
-        curr = current->next;
+        curr = curr->next;
         kfree(tmp);
     }
 }
