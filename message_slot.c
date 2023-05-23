@@ -117,7 +117,7 @@ static ssize_t device_read( struct file* file,
                             size_t       length,
                             loff_t*      offset )
 {
-  int i = 0;
+  int i = 0, j = 0;
   //int minor_number = iminor(file->f_inode);
   //message_slot_file *slot = &device_info.slots[minor_number];
   ssize_t bytes_read = -1;
@@ -153,15 +153,24 @@ static ssize_t device_read( struct file* file,
       return -EFAULT;  // Error copying data to user space
   }
   */
-
+  char save_user_buffer[MAX_MESSAGE_SIZE];
+  for (i = 0; i < length; i++){
+      if (get_user(save_user_buffer[i], &buffer[i]) != 0){
+          printk("Error copying data from user space using get_user\n");
+          return -EFAULT;
+      }
+  }
+  // -----
   for (i = 0; i < cur_channel->message_length; i++){
       if (put_user(cur_channel->message[i], &buffer[i]) != 0){
           printk("Error copying data to user space using put_user\n");
+          for (j = 0; j < i; j++){
+              put_user(save_user_buffer[j], &buffer[j]);
+          }
           return -EFAULT;
       }
   }
   
-
   bytes_read = cur_channel->message_length;
   return bytes_read;
 }
