@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     char *file_path;
     int channel_id, fd;
-    size_t message_length, bytes_read;
+    size_t bytes_read;
     char buffer[MAX_MESSAGE_SIZE]; // 128
     ssize_t bytes_written_to_output;
 
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
     fd = open(file_path, O_RDWR);
     if( fd < 0 ) {
-        perror("Can't open device file path: %s\n", file_path);
+        perror("Can't open device file path");
         exit(1);
     }
 

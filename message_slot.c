@@ -340,6 +340,7 @@ static void __exit simple_cleanup(void)
   }
 
   unregister_chrdev(MAJOR_NUMBER, DEVICE_RANGE_NAME);
+  printk( "Unregisteration is successful. ");
 }
 
 //---------------------------------------------------------------

@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
     fd = open(file_path, O_RDWR);
     if( fd < 0 ) {
-        perror("Can't open device file path: %s\n", file_path);
+        perror("Can't open device file path");
         exit(1);
     }
 

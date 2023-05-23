@@ -11,7 +11,7 @@
 
 #define SUCCESS 0
 #define DEVICE_RANGE_NAME "char_dev"
-#define DEVICE_FILE_NAME "simple_char_dev"
+#define DEVICE_FILE_NAME "msgslot"
 
 
 struct channel_node {
